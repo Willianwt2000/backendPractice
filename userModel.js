@@ -14,8 +14,8 @@ const userSchema = new mongoose.Schema({
 // En tu modelo User.js (recomendado)
 userSchema.pre('save', async function(next) {
   if (!this.isModified('password')) return next(); // Evita re-hashear si no cambió.
-  const salt = await bcrypt.genSalt(10); // Genera un salt único.
-  this.password = await bcrypt.hash(this.password, salt); // Combina salt + hash.
+  const salt = await bcrypt.genSalt(10); 
+  this.password = await bcrypt.hash(this.password, salt); 
   next();
 });
 
