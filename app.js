@@ -125,16 +125,34 @@ app.post("/api/login", async (req, res) => {
     if (!isMatch) return res.status(401).json({ error: "Invalid credential" });
 
     // *  Generate token
-
     const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET, {
       expiresIn: "1h",
+    });
+
+    const isProduction = process.env.NODE_ENV === "production"; // verified if is working in production
+
+    res.cookie("accessToken", token, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: "Lax",
+      maxAge: 60 * 60 * 1000,
+      path: "/",
     });
 
     console.log({
       token,
     });
 
-    res.json({ success: true, token });
+
+    app.get('/dashboard', (req, res) => {
+    });
+    res.send(`<h1>Bienvenido ${user.name} al dashboard protegido!</h1>`);
+
+    // res.status(200).json({
+    //   message: "Inicio de sesión exitoso",
+    //   user: { email: user.email },
+    // });
+
   } catch (err) {
     console.error("Error en POST /api/users:", err);
     res.status(500).json({ error: err.message });
@@ -151,4 +169,6 @@ if (PORT === undefined) {
 app.listen(PORT, () => {
   connectDB().catch(console.error);
   console.log(`🚀 Server running on port http://localhost:${PORT}`);
+  console.log(`🔐 JWT_SECRET: ${process.env.JWT_SECRET ? '✅ Configurado' : '❌ NO CONFIGURADO'}`);
 });
+
