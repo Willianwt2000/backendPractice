@@ -6,7 +6,7 @@ import { connectDB } from "./db.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
-// Configuración inicial
+// Load environment variables
 dotenv.config();
 const app = express();
 
@@ -19,7 +19,6 @@ app.use(cors());
 //   origin: 'http://127.0.0.1:5500' // Solo permitir tu origen frontend
 // }));
 // Conectar al iniciar
-
 app.get("/api/users", async (req, res) => {
   try {
     const users = await User.find().select("-password -createdAt");
@@ -89,6 +88,23 @@ app.post("/api/signup", async (req, res) => {
   }
 });
 
+
+app.delete("/api/delete/:id", async (req, res) => {
+  const userIdToDelete = req.params.id; 
+  try {
+    
+    let deleteUsers = await User.findByIdAndDelete(userIdToDelete);
+    if (!deleteUsers) return res.status(404).json({ message: "User not found" });
+    console.log({Usuario: deleteUsers})
+    res.status(204).end()
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+})
+
+
+//Login
 app.post("/api/login", async (req, res) => {
   const { email, password } = req.body;
 
@@ -131,6 +147,7 @@ app.post("/api/login", async (req, res) => {
 
     const isProduction = process.env.NODE_ENV === "production"; // verified if is working in production
 
+    //saving token
     res.cookie("accessToken", token, {
       httpOnly: true,
       secure: isProduction,
@@ -144,14 +161,10 @@ app.post("/api/login", async (req, res) => {
     });
 
 
-    app.get('/dashboard', (req, res) => {
+    res.status(200).json({
+      message: "Inicio de sesión exitoso",
+      user: { email: user.email },
     });
-    res.send(`<h1>Bienvenido ${user.name} al dashboard protegido!</h1>`);
-
-    // res.status(200).json({
-    //   message: "Inicio de sesión exitoso",
-    //   user: { email: user.email },
-    // });
 
   } catch (err) {
     console.error("Error en POST /api/users:", err);
