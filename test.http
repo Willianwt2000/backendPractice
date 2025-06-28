@@ -20,3 +20,7 @@ Accept: application/json
     "email": "mariacarmen28@example.com",
     "password": "conyyesddw"
 }
+
+###
+DELETE http://localhost:4000/api/delete/68606d8618be6649b483f882 HTTP/1.1
+Content-Type: application/json
