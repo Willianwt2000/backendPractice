@@ -15,10 +15,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors());
 
-// app.use(cors({
-//   origin: 'http://127.0.0.1:5500' // Solo permitir tu origen frontend
-// }));
-// Conectar al iniciar
+
 app.get("/api/users", async (req, res) => {
   try {
     const users = await User.find().select("-password -createdAt");
